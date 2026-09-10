@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Carbon & Obsidian Surfaces */
+  --bg-vault: #08080a;
+  --bg-surface: #0f0f13;
+  --bg-card: #14141a;
+  --bg-card-hover: #1a1a22;
+  --bg-elevated: #1f1f2a;
+  --bg-glass: rgba(15, 15, 19, 0.82);
+
+  /* Refined Lacquer Red */
+  --accent-red: #dc2626;
+  --accent-red-hover: #ef4444;
+  --accent-red-deep: #991b1b;
+  --accent-red-glow: rgba(220, 38, 38, 0.18);
+  --accent-red-subtle: rgba(220, 38, 38, 0.08);
+
+  /* Warm Ochre / Brass Gold */
+  --accent-gold: #d97706;
+  --accent-gold-hover: #f59e0b;
+  --accent-gold-dim: rgba(217, 119, 6, 0.15);
+  --accent-gold-subtle: rgba(217, 119, 6, 0.06);
+
+  /* Neutral Text Hierarchy */
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  /* Architectural Borders */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-red: rgba(220, 38, 38, 0.35);
+  --border-gold: rgba(217, 119, 6, 0.28);
+
+  /* Layered Directional Shadows */
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-vault: 0 8px 24px -4px rgba(0, 0, 0, 0.85), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 12px 32px -4px rgba(0, 0, 0, 0.9), 0 4px 10px rgba(0, 0, 0, 0.5);
+
+  /* Typography */
+  --font-arabic: 'Cairo', system-ui, -apple-system, sans-serif;
+  --font-latin: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Cinzel', 'Cairo', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Intentional Architectural Radii (No uniform pill overkill) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: var(--bg-vault);
+  color: var(--text-primary);
+  font-family: var(--font-arabic);
+  font-size: 16px;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html[lang='en'] {
+  font-family: var(--font-latin);
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--bg-vault);
+  background-image: 
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(220, 38, 38, 0.08) 0%, transparent 70%),
+    radial-gradient(circle 35% at 95% 40%, rgba(217, 119, 6, 0.03) 0%, transparent 60%),
+    linear-gradient(to bottom, #08080a 0%, #0c0c10 50%, #08080a 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle editorial vignette overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.45) 100%);
+  z-index: 1;
+}
+
+.site-container {
+  position: relative;
+  z-index: 2;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 6rem;
+}
+
+@media (max-width: 640px) {
+  .site-container {
+    padding: 1.5rem 1rem 5rem;
+  }
+}
+
+/* Typography & Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Links & Buttons */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-vault);
+}
+::-webkit-scrollbar-thumb {
+  background: #202028;
+  border-radius: var(--radius-xs);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-red-deep);
+}
+
+/* Subtle Micro-Interactions */
+@keyframes fadeInHighlight {
+  0% {
+    border-color: var(--accent-red);
+    background-color: var(--bg-elevated);
+  }
+  100% {
+    border-color: var(--border-subtle);
+    background-color: var(--bg-card);
+  }
+}
+
+.flash-highlight {
+  animation: fadeInHighlight 2s ease-out;
+}
+
+/* Glass panel */
+.vault-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-vault);
+}
+
+/* Refined Primary Action Button */
+.btn-red {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  background: var(--accent-red);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.65rem 1.3rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-subtle);
+  transition: var(--transition-smooth);
+}
+
+.btn-red:hover:not(:disabled) {
+  background: var(--accent-red-hover);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-red:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary Button Style */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.88rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  transition: var(--transition-smooth);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--border-medium);
+  color: #ffffff;
+}
+
+/* Input elements */
+.vault-input, .vault-textarea {
+  width: 100%;
+  background: rgba(12, 12, 16, 0.85);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.92rem;
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.vault-input:focus, .vault-textarea:focus {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 0 2px var(--accent-red-subtle);
+}
+
+.vault-textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.vault-input::placeholder, .vault-textarea::placeholder {
+  color: var(--text-muted);
+}

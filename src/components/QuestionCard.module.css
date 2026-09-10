@@ -1,0 +1,244 @@
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  transition: var(--transition-smooth);
+  position: relative;
+  box-shadow: var(--shadow-subtle);
+}
+
+.card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Follow-up thread indicator */
+.threadBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent-gold-subtle);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-xs);
+  padding: 0.45rem 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.78rem;
+  color: var(--accent-gold);
+}
+
+.threadText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: italic;
+  max-width: 85%;
+}
+
+/* Asker Meta */
+.askerMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.askerInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.askerAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-xs);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid var(--border-subtle);
+}
+
+.askerName {
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--text-primary);
+}
+
+.askDate {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* Question body */
+.questionBody {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  padding-inline-start: 0.85rem;
+  border-inline-start: 2px solid var(--border-medium);
+}
+
+/* Prof Answer Box */
+.answerBox {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-inline-start: 2px solid var(--accent-red);
+  border-radius: var(--radius-sm);
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.answerHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.65rem;
+}
+
+.profMiniMask {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  flex-shrink: 0;
+}
+
+.profMiniImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profTitle {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-red);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.answerDate {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-inline-start: auto;
+}
+
+.answerText {
+  font-size: 0.94rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  white-space: pre-line;
+}
+
+/* Actions footer */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.footerLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.likeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.likeBtn span {
+  font-family: var(--font-mono);
+}
+
+.likeBtn:hover:not(:disabled) {
+  border-color: var(--border-red);
+  color: var(--accent-red);
+  background: var(--accent-red-subtle);
+}
+
+.likeBtnActive {
+  background: var(--accent-red-subtle);
+  border-color: var(--border-red);
+  color: var(--accent-red);
+}
+
+.likeBtnActive svg {
+  fill: var(--accent-red);
+}
+
+.followUpBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--accent-gold);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.followUpBtn:hover {
+  border-color: var(--border-gold);
+  background: var(--accent-gold-dim);
+}
+
+.shareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.shareBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.copiedBadge {
+  color: #22c55e !important;
+}
