@@ -123,7 +123,7 @@ export const translations: Record<Locale, TranslationDictionary> = {
     askModal: {
       triggerButton: 'اسأل بروف سؤالاً',
       title: 'إرسال استفسار مشفر',
-      desc: 'رسالتك وصلت يا صحبي، واطمن هويتك امان، عيش براحتك يا هندسة.',
+      desc: 'مكان الرسائل، ارسل ما يحلو لك يا ملك',
       questionLabel: 'نص السؤال أو الاستشارة التقنية',
       questionPlaceholder: 'اكتب سؤالك او نقدك او اي حاجه انت عايزها يا هندسة',
       nameLabel: 'الاسم أو اللقب (اختياري)',
@@ -133,12 +133,12 @@ export const translations: Record<Locale, TranslationDictionary> = {
       cancelReply: 'إلغاء الارتباط',
       submitButton: 'إيداع السؤال في سلة الاسئلة',
       submitting: 'جارٍ التشفير والإرسال...',
-      successTitle: 'تم إيداع رسالتك بنجاح في الخزينة!',
+      successTitle: 'رسالتك وصلت يا صحبي، واطمن هويتك امان، عيش براحتك يا هندسة.',
       successDesc: 'تم حفظ السؤال وحالته الآن «قيد المراجعة». سيقوم البروف بدراسته وإضافة الإجابة ونشرها في السجل العام.',
       successBadge: 'مشفر ومحفوظ',
       closeButton: 'إغلاق',
       rateLimitError: 'لقد قمت بإرسال عدد كبير من الرسائل خلال وقت قصير. يُرجى الانتظار قليلاً.',
-      validationError: 'يُرجى كتابة سؤال يتجاوز ١٠ أحرف على الأقل.',
+      validationError: 'اكتب سؤال عدل يا راجل، مش اقل من 8 حروف يا هندسة',
     },
     inbox: {
       title: 'غرفة الرد والفلترة والعرض',
