@@ -111,7 +111,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           </div>
           <span className={styles.askerName}>{askerDisplay}</span>
         </div>
-        <time className={styles.askDate} dateTime={question.created_at}>
+        <time className={styles.askDate} dateTime={question.created_at} suppressHydrationWarning>
           {formatDate(question.created_at)}
         </time>
       </div>
@@ -134,7 +134,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             </div>
             <span className={styles.profTitle}>{t.feed.profSignature}</span>
             {question.answered_at && (
-              <span className={styles.answerDate}>
+              <span className={styles.answerDate} suppressHydrationWarning>
                 {formatDate(question.answered_at)}
               </span>
             )}

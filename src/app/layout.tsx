@@ -19,8 +19,15 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Mahmoud Sayed Mohamed' }],
   icons: {
-    icon: '/dali-mask.png',
-    apple: '/dali-mask.png',
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon.png', type: 'image/png' },
+      { url: '/dali-mask-transparent.png', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png' },
+      { url: '/dali-mask-transparent.png' },
+    ],
   },
   openGraph: {
     title: 'Prof (بروف) — Ask Me Anything',
