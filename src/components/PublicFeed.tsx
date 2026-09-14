@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Question } from '@/types/question';
 import { useLanguage } from './LanguageContext';
 import { QuestionCard } from './QuestionCard';
-import { Clock, Flame, Search, X, MessageSquareDashed } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import styles from './PublicFeed.module.css';
 
 interface PublicFeedProps {
@@ -20,14 +20,17 @@ export const PublicFeed: React.FC<PublicFeedProps> = ({
 }) => {
   const { t } = useLanguage();
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
+  const [prevInitial, setPrevInitial] = useState(initialQuestions);
+
+  // Sync state cleanly when props change without effect setState error
+  if (initialQuestions !== prevInitial) {
+    setPrevInitial(initialQuestions);
+    setQuestions(initialQuestions);
+  }
+
   const [sortTab, setSortTab] = useState<'recent' | 'liked'>('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
-
-  // Sync state if initial questions change
-  useEffect(() => {
-    setQuestions(initialQuestions);
-  }, [initialQuestions]);
 
   // Handle hash anchoring on load / hashchange
   useEffect(() => {
@@ -54,7 +57,6 @@ export const PublicFeed: React.FC<PublicFeedProps> = ({
   const filteredAndSorted = useMemo(() => {
     let list = [...questions];
 
-    // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       list = list.filter(
@@ -65,13 +67,20 @@ export const PublicFeed: React.FC<PublicFeedProps> = ({
       );
     }
 
-    // Sort
     if (sortTab === 'liked') {
-      list.sort((a, b) => b.likes_count - a.likes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      list.sort(
+        (a, b) =>
+          b.likes_count - a.likes_count ||
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
     } else {
       list.sort((a, b) => {
-        const timeA = a.answered_at ? new Date(a.answered_at).getTime() : new Date(a.created_at).getTime();
-        const timeB = b.answered_at ? new Date(b.answered_at).getTime() : new Date(b.created_at).getTime();
+        const timeA = a.answered_at
+          ? new Date(a.answered_at).getTime()
+          : new Date(a.created_at).getTime();
+        const timeB = b.answered_at
+          ? new Date(b.answered_at).getTime()
+          : new Date(b.created_at).getTime();
         return timeB - timeA;
       });
     }
@@ -88,14 +97,13 @@ export const PublicFeed: React.FC<PublicFeedProps> = ({
 
   return (
     <section className={styles.feedSection} aria-label={t.feed.title}>
+      {/* Controls Bar: Search & Tabs */}
       <div className={styles.feedControls}>
         <div className={styles.controlsTopRow}>
           <div className={styles.feedTitleGroup}>
-            <h3 className={styles.feedHeading}>{t.feed.title}</h3>
-            <p className={styles.feedSubheading}>{t.feed.subtitle}</p>
+            <h2 className={styles.feedHeading}>{t.feed.title}</h2>
           </div>
 
-          {/* Sorting Tabs */}
           <div className={styles.tabsContainer} role="tablist">
             <button
               onClick={() => setSortTab('recent')}
@@ -103,8 +111,7 @@ export const PublicFeed: React.FC<PublicFeedProps> = ({
               role="tab"
               aria-selected={sortTab === 'recent'}
             >
-              <Clock size={14} />
-              <span>{t.feed.tabRecent}</span>
+              {t.feed.tabRecent}
             </button>
             <button
               onClick={() => setSortTab('liked')}
@@ -112,15 +119,14 @@ export const PublicFeed: React.FC<PublicFeedProps> = ({
               role="tab"
               aria-selected={sortTab === 'liked'}
             >
-              <Flame size={14} />
-              <span>{t.feed.tabLiked}</span>
+              {t.feed.tabLiked}
             </button>
           </div>
         </div>
 
-        {/* Search input */}
+        {/* Search bar */}
         <div className={styles.searchContainer}>
-          <Search size={16} className={styles.searchIcon} />
+          <Search size={15} className={styles.searchIcon} />
           <input
             type="text"
             className={styles.searchInput}
@@ -134,7 +140,7 @@ export const PublicFeed: React.FC<PublicFeedProps> = ({
               className={styles.clearSearchBtn}
               aria-label="Clear search"
             >
-              <X size={15} />
+              <X size={14} />
             </button>
           )}
         </div>
@@ -155,8 +161,7 @@ export const PublicFeed: React.FC<PublicFeedProps> = ({
         </div>
       ) : (
         <div className={styles.emptyState}>
-          <MessageSquareDashed size={42} className={styles.emptyIcon} />
-          <h4 className={styles.emptyTitle}>{t.feed.noQuestions}</h4>
+          <p className={styles.emptyTitle}>{t.feed.noQuestions}</p>
           <p className={styles.emptyDesc}>{t.feed.noQuestionsSub}</p>
         </div>
       )}

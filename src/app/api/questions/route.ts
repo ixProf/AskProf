@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Question securely vaulted in pending queue.',
+      message: 'Question submitted successfully.',
       data: {
         id: created.id,
         created_at: created.created_at,

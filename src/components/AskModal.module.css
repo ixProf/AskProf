@@ -1,59 +1,44 @@
-/* Floating CTA Button */
+/* Floating Action Button */
 .floatingCtaContainer {
   position: fixed;
   bottom: 2rem;
-  inset-inline-end: 2rem;
+  right: 2rem;
   z-index: 100;
 }
 
 .floatingCtaBtn {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.5rem;
   background: var(--accent-red);
   color: #ffffff;
   font-weight: 600;
-  font-size: 0.92rem;
-  padding: 0.75rem 1.4rem;
+  font-size: 0.88rem;
+  padding: 0.7rem 1.25rem;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: var(--shadow-vault);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-hover);
   cursor: pointer;
   transition: var(--transition-smooth);
 }
 
 .floatingCtaBtn:hover {
   background: var(--accent-red-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.pulsingDot {
-  width: 6px;
-  height: 6px;
-  background: #ffffff;
-  border-radius: 50%;
-  opacity: 0.85;
+  transform: translateY(-1px);
 }
 
 /* Modal Backdrop */
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(6, 6, 8, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.25rem;
-  animation: fadeIn 0.15s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  padding: 1rem;
 }
 
 /* Modal Container */
@@ -61,61 +46,42 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-md);
-  max-width: 520px;
+  max-width: 480px;
   width: 100%;
-  padding: 1.75rem;
+  padding: 1.5rem;
   position: relative;
-  box-shadow: var(--shadow-vault);
-  animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes scaleUp {
-  from { transform: scale(0.97); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  box-shadow: var(--shadow-modal);
 }
 
 .modalHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 1.35rem;
+  margin-bottom: 1.25rem;
 }
 
 .modalTitleGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-}
-
-.vaultBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--accent-red);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  gap: 0.2rem;
 }
 
 .modalTitle {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.02em;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .modalDesc {
   font-size: 0.82rem;
   color: var(--text-muted);
-  line-height: 1.5;
-  margin-top: 0.1rem;
+  line-height: 1.4;
 }
 
 .closeBtn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--text-muted);
   width: 28px;
   height: 28px;
@@ -128,21 +94,20 @@
 }
 
 .closeBtn:hover {
+  color: var(--text-primary);
   background: var(--bg-card-hover);
-  color: #ffffff;
-  border-color: var(--border-medium);
 }
 
 /* Form Styles */
 .formGroup {
-  margin-bottom: 1.15rem;
+  margin-bottom: 1rem;
 }
 
 .formLabelRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.4rem;
 }
 
 .formLabel {
@@ -157,111 +122,106 @@
   color: var(--text-muted);
 }
 
+.fieldHint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
 .parentContextBox {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--accent-gold-subtle);
-  border: 1px solid var(--border-gold);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
   padding: 0.5rem 0.75rem;
-  margin-bottom: 1.15rem;
+  margin-bottom: 1rem;
   font-size: 0.78rem;
 }
 
+.parentContextContent {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow: hidden;
+}
+
+.parentContextIcon {
+  color: var(--accent-thread);
+  flex-shrink: 0;
+}
+
 .parentContextText {
-  color: var(--accent-gold);
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 80%;
 }
 
 .clearParentBtn {
   color: var(--text-muted);
   font-size: 0.72rem;
-  text-decoration: underline;
   cursor: pointer;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
 }
 
 .clearParentBtn:hover {
-  color: #ffffff;
-}
-
-.anonymousHint {
-  font-size: 0.75rem;
-  color: var(--accent-gold);
-  margin-top: 0.35rem;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
+  color: var(--text-primary);
+  text-decoration: underline;
 }
 
 .errorBanner {
-  background: var(--accent-red-subtle);
+  background: rgba(220, 38, 38, 0.1);
   border: 1px solid var(--border-red);
-  color: #fca5a5;
-  padding: 0.55rem 0.85rem;
+  color: #ef4444;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--radius-xs);
   font-size: 0.82rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .formActions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.65rem;
-  margin-top: 1.35rem;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
 }
 
 /* Success Confirmation Screen */
 .successBox {
   text-align: center;
-  padding: 1.25rem 0.5rem;
+  padding: 1.5rem 0.5rem 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.successIconShield {
-  width: 52px;
-  height: 52px;
+.successIconWrap {
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-sm);
-  background: var(--bg-card);
-  border: 1px solid var(--border-medium);
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-red);
+  color: #16a34a;
   margin-bottom: 1rem;
 }
 
 .successTitle {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
   margin-bottom: 0.4rem;
 }
 
 .successDesc {
   font-size: 0.88rem;
   color: var(--text-secondary);
-  line-height: 1.6;
-  max-width: 400px;
-  margin-bottom: 1.25rem;
-}
-
-.vaultSealPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: var(--accent-gold-subtle);
-  border: 1px solid var(--border-gold);
-  color: var(--accent-gold);
-  padding: 0.3rem 0.75rem;
-  border-radius: var(--radius-xs);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
+  line-height: 1.5;
+  max-width: 360px;
   margin-bottom: 1.5rem;
 }

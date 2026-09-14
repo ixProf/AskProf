@@ -1,12 +1,12 @@
 .feedSection {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .feedControls {
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
-  margin-bottom: 2rem;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .controlsTopRow {
@@ -14,32 +14,27 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: var(--space-3);
 }
 
 .feedTitleGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
 }
 
 .feedHeading {
+  font-family: var(--font-display);
   font-size: 1.35rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
 }
 
-.feedSubheading {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-
-/* Segmented Control Tabs */
+/* Restrained Segmented Control */
 .tabsContainer {
   display: inline-flex;
   background: var(--bg-surface);
-  padding: 3px;
+  padding: 2px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
 }
@@ -47,11 +42,13 @@
 .tabBtn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-xs);
-  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
   color: var(--text-muted);
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -63,12 +60,12 @@
 
 .tabActive {
   background: var(--bg-card);
-  color: #ffffff;
+  color: var(--text-primary);
   border: 1px solid var(--border-medium);
   box-shadow: var(--shadow-subtle);
 }
 
-/* Search input */
+/* Minimalist Search Input */
 .searchContainer {
   position: relative;
   width: 100%;
@@ -80,7 +77,7 @@
   transform: translateY(-50%);
   color: var(--text-muted);
   pointer-events: none;
-  inset-inline-start: 0.85rem;
+  left: 0.85rem;
 }
 
 .searchInput {
@@ -88,8 +85,7 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 0.65rem 1rem;
-  padding-inline-start: 2.5rem;
+  padding: 0.6rem 1rem 0.6rem 2.4rem;
   color: var(--text-primary);
   font-family: inherit;
   font-size: 0.88rem;
@@ -99,14 +95,17 @@
 
 .searchInput:focus {
   border-color: var(--border-medium);
-  background: var(--bg-card);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
 }
 
 .clearSearchBtn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  inset-inline-end: 0.85rem;
+  right: 0.85rem;
   color: var(--text-muted);
   cursor: pointer;
   display: flex;
@@ -115,7 +114,14 @@
 }
 
 .clearSearchBtn:hover {
-  color: #ffffff;
+  color: var(--text-primary);
+}
+
+/* Questions List with systematic spacing */
+.questionsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 /* Empty State */
@@ -123,27 +129,21 @@
   background: var(--bg-card);
   border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 3.5rem 1.5rem;
+  padding: 3rem 1.5rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.emptyIcon {
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
-}
-
 .emptyTitle {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
 }
 
 .emptyDesc {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
-  max-width: 340px;
 }

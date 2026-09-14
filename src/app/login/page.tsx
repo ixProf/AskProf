@@ -1,29 +1,26 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Question } from '@/types/question';
 import { useLanguage } from '@/components/LanguageContext';
+import { useTheme } from '@/components/ThemeContext';
 import {
-  Lock,
-  ArrowRight,
   ArrowLeft,
   LogOut,
   Send,
   Trash2,
   Inbox,
   Archive,
-  CheckCircle2,
-  ShieldAlert,
-  GitCommit,
-  Globe,
-  Sparkles,
+  Check,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import styles from './inbox.module.css';
 
 export default function AdminInboxPage() {
-  const { locale, t, toggleLanguage, dir } = useLanguage();
+  const { t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
@@ -33,13 +30,31 @@ export default function AdminInboxPage() {
   const [activeTab, setActiveTab] = useState<'pending' | 'answered'>('pending');
   const [pendingQuestions, setPendingQuestions] = useState<Question[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState<Question[]>([]);
-  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   // Draft answers map: [questionId -> answerText]
   const [draftAnswers, setDraftAnswers] = useState<Record<string, string>>({});
   const [isPublishingId, setIsPublishingId] = useState<string | null>(null);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [feedbackToast, setFeedbackToast] = useState<string | null>(null);
+
+  const fetchQuestions = React.useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/questions');
+      if (res.ok) {
+        const data = await res.json();
+        setPendingQuestions(data.pending || []);
+        setAnsweredQuestions(data.answered || []);
+
+        const draftMap: Record<string, string> = {};
+        (data.answered || []).forEach((q: Question) => {
+          if (q.answer_text) draftMap[q.id] = q.answer_text;
+        });
+        setDraftAnswers((prev) => ({ ...draftMap, ...prev }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch questions:', err);
+    }
+  }, []);
 
   // Check auth on load
   useEffect(() => {
@@ -56,34 +71,11 @@ export default function AdminInboxPage() {
       }
     }
     checkAuth();
-  }, []);
-
-  const fetchQuestions = async () => {
-    setIsLoadingQuestions(true);
-    try {
-      const res = await fetch('/api/admin/questions');
-      if (res.ok) {
-        const data = await res.json();
-        setPendingQuestions(data.pending || []);
-        setAnsweredQuestions(data.answered || []);
-
-        // Prepopulate draft answers for answered ones
-        const draftMap: Record<string, string> = {};
-        (data.answered || []).forEach((q: Question) => {
-          if (q.answer_text) draftMap[q.id] = q.answer_text;
-        });
-        setDraftAnswers((prev) => ({ ...draftMap, ...prev }));
-      }
-    } catch (err) {
-      console.error('Failed to fetch questions:', err);
-    } finally {
-      setIsLoadingQuestions(false);
-    }
-  };
+  }, [fetchQuestions]);
 
   const showToast = (msg: string) => {
     setFeedbackToast(msg);
-    setTimeout(() => setFeedbackToast(null), 3500);
+    setTimeout(() => setFeedbackToast(null), 3000);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -103,11 +95,7 @@ export default function AdminInboxPage() {
       if (!res.ok || !data.success) {
         if (res.status === 429) {
           const waitMin = data.resetInSeconds ? Math.ceil(data.resetInSeconds / 60) : 15;
-          setAuthError(
-            locale === 'ar'
-              ? `تم تجاوز عدد المحاولات المسموح بها. تم حظر الدخول مؤقتاً لمدة ${waitMin} دقيقة.`
-              : `Too many failed attempts. Locked out for ${waitMin} minutes.`
-          );
+          setAuthError(`Too many failed attempts. Locked out for ${waitMin} minutes.`);
         } else {
           setAuthError(t.inbox.invalidPass);
         }
@@ -118,7 +106,7 @@ export default function AdminInboxPage() {
       setIsAuthenticated(true);
       fetchQuestions();
     } catch {
-      setAuthError('Connection error to vault.');
+      setAuthError('Connection error. Please try again.');
     } finally {
       setIsLoggingIn(false);
     }
@@ -141,7 +129,7 @@ export default function AdminInboxPage() {
   const handlePublishAnswer = async (id: string) => {
     const answer = (draftAnswers[id] || '').trim();
     if (!answer) {
-      showToast(locale === 'ar' ? 'يُرجى كتابة إجابة قبل النشر' : 'Please provide an answer before publishing');
+      showToast('Please provide an answer before publishing.');
       return;
     }
 
@@ -156,8 +144,7 @@ export default function AdminInboxPage() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(locale === 'ar' ? 'تم اعتماد الإجابة ونشرها في السجل العام بنجاح!' : 'Dispatch published successfully to the public feed!');
-        // Refresh question sets
+        showToast('Answer published to the public feed.');
         await fetchQuestions();
       } else {
         showToast(data.error || 'Failed to publish.');
@@ -170,10 +157,7 @@ export default function AdminInboxPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const confirmPrompt = locale === 'ar'
-      ? 'هل أنت متأكد من حذف واستبعاد هذا السؤال؟ لا يمكن التراجع عن هذا الإجراء.'
-      : 'Are you sure you want to dismiss and purge this question?';
-
+    const confirmPrompt = 'Are you sure you want to delete this question? This action cannot be undone.';
     if (!window.confirm(confirmPrompt)) return;
 
     setIsDeletingId(id);
@@ -185,7 +169,7 @@ export default function AdminInboxPage() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(locale === 'ar' ? 'تم استبعاد وحذف السؤال من الخزينة.' : 'Question purged from vault.');
+        showToast('Question deleted.');
         setPendingQuestions((prev) => prev.filter((q) => q.id !== id));
         setAnsweredQuestions((prev) => prev.filter((q) => q.id !== id));
       } else {
@@ -198,32 +182,22 @@ export default function AdminInboxPage() {
     }
   };
 
-  const BackIcon = dir === 'rtl' ? ArrowRight : ArrowLeft;
-
-  // 1. Loading screen while verifying initial session
+  // 1. Loading session
   if (isAuthenticated === null) {
     return (
       <div className={styles.authContainer}>
         <div className={styles.authCard}>
-          <div className={styles.authIconLock}>
-            <Lock size={32} />
-          </div>
-          <h2 className={styles.authTitle}>
-            {locale === 'ar' ? 'جارٍ التحقق من تصريح الخزينة...' : 'Verifying vault credentials...'}
-          </h2>
+          <p className={styles.authDesc}>Checking session...</p>
         </div>
       </div>
     );
   }
 
-  // 2. Auth Challenge Screen if not logged in
+  // 2. Login Screen
   if (!isAuthenticated) {
     return (
       <div className={styles.authContainer}>
         <div className={styles.authCard}>
-          <div className={styles.authIconLock}>
-            <Lock size={30} />
-          </div>
           <h2 className={styles.authTitle}>{t.inbox.passphraseTitle}</h2>
           <p className={styles.authDesc}>{t.inbox.passphraseDesc}</p>
 
@@ -244,52 +218,28 @@ export default function AdminInboxPage() {
               className="btn-red"
               disabled={isLoggingIn || !passwordInput}
             >
-              <Sparkles size={16} />
               <span>{isLoggingIn ? t.inbox.loggingIn : t.inbox.loginButton}</span>
             </button>
           </form>
 
-          <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+          <div className={styles.authFooterLinks}>
             <Link href="/" className={styles.homeBackLink}>
-              <BackIcon size={14} />
+              <ArrowLeft size={14} />
               <span>{t.inbox.returnHome}</span>
             </Link>
-            <button onClick={toggleLanguage} className={styles.homeBackLink} style={{ cursor: 'pointer' }}>
-              <Globe size={14} />
-              <span>{t.header.langToggle}</span>
-            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  // 3. Admin Command Room / Inbox
+  // 3. Admin Inbox
   return (
     <main className={styles.inboxContainer}>
       {/* Toast Feedback */}
       {feedbackToast && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '1.5rem',
-            insetInlineEnd: '1.5rem',
-            zIndex: 999,
-            background: 'var(--bg-card)',
-            border: '1px solid var(--accent-red)',
-            boxShadow: '0 8px 30px var(--accent-red-glow)',
-            color: '#ffffff',
-            padding: '0.85rem 1.4rem',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.9rem',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.6rem',
-            animation: 'fadeIn 0.2s ease-out',
-          }}
-        >
-          <CheckCircle2 size={18} color="var(--accent-red)" />
+        <div className={styles.toast}>
+          <Check size={16} />
           <span>{feedbackToast}</span>
         </div>
       )}
@@ -297,38 +247,33 @@ export default function AdminInboxPage() {
       {/* Top Bar Navigation */}
       <div className={styles.inboxTopBar}>
         <div className={styles.inboxBranding}>
-          <div className={styles.miniMaskIcon}>
-            <Image
-              src="/dali-mask.png"
-              alt="Prof Dalí Mask"
-              width={38}
-              height={38}
-              className={styles.miniMaskImg}
-            />
-          </div>
-          <div className={styles.titleArea}>
-            <h1>{t.inbox.title}</h1>
-            <p>{t.inbox.subtitle}</p>
-          </div>
+          <h1 className={styles.adminWordmark}>
+            Ask Prof<span className={styles.brandAccent}>.</span>
+          </h1>
+          <span className={styles.adminBadge}>Admin</span>
         </div>
 
         <div className={styles.topActions}>
           <button
-            onClick={toggleLanguage}
+            onClick={toggleTheme}
             className="btn-secondary"
-            style={{ padding: '0.45rem 0.9rem', fontSize: '0.82rem' }}
+            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem' }}
+            title="Toggle theme"
           >
-            <Globe size={14} />
-            <span>{t.header.langToggle}</span>
+            {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
           </button>
 
-          <Link href="/" className="btn-secondary" style={{ padding: '0.45rem 0.9rem', fontSize: '0.82rem' }}>
-            <BackIcon size={14} />
+          <Link
+            href="/"
+            className="btn-secondary"
+            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem' }}
+          >
+            <ArrowLeft size={14} />
             <span>{t.inbox.returnHome}</span>
           </Link>
 
           <button onClick={handleLogout} className={styles.logoutBtn}>
-            <LogOut size={14} />
+            <LogOut size={13} />
             <span>{t.inbox.logoutButton}</span>
           </button>
         </div>
@@ -341,7 +286,7 @@ export default function AdminInboxPage() {
             onClick={() => setActiveTab('pending')}
             className={`${styles.tabBtn} ${activeTab === 'pending' ? styles.tabActive : ''}`}
           >
-            <Inbox size={15} />
+            <Inbox size={14} />
             <span>{t.inbox.pendingTab}</span>
             <span className={styles.badgePill}>{pendingQuestions.length}</span>
           </button>
@@ -350,19 +295,10 @@ export default function AdminInboxPage() {
             onClick={() => setActiveTab('answered')}
             className={`${styles.tabBtn} ${activeTab === 'answered' ? styles.tabActive : ''}`}
           >
-            <Archive size={15} />
+            <Archive size={14} />
             <span>{t.inbox.answeredTab}</span>
             <span className={styles.badgePill}>{answeredQuestions.length}</span>
           </button>
-        </div>
-
-        <div className="gold-badge">
-          <ShieldAlert size={14} />
-          <span>
-            {locale === 'ar'
-              ? `${pendingQuestions.length} ${t.inbox.pendingCount}`
-              : `${pendingQuestions.length} ${t.inbox.pendingCount}`}
-          </span>
         </div>
       </div>
 
@@ -371,7 +307,6 @@ export default function AdminInboxPage() {
         <section>
           {pendingQuestions.length === 0 ? (
             <div className={styles.emptyStateBox}>
-              <CheckCircle2 size={50} color="var(--accent-red)" />
               <h3>{t.inbox.emptyPending}</h3>
               <p>{t.inbox.emptyPendingSub}</p>
             </div>
@@ -381,46 +316,30 @@ export default function AdminInboxPage() {
                 key={q.id}
                 className={`${styles.adminCard} ${styles.adminCardPending}`}
               >
-                {/* Asker & Meta info */}
                 <div className={styles.cardHeader}>
                   <div className={styles.askerTag}>
                     <span>{q.is_anonymous ? t.feed.anonymous : q.asker_name}</span>
-                    <span style={{ color: 'var(--text-muted)' }}>·</span>
-                    <span className="gold-badge" style={{ fontSize: '0.7rem', padding: '0.1rem 0.5rem' }}>
-                      {locale === 'ar' ? 'قيد الانتظار' : 'Pending'}
-                    </span>
                   </div>
-                  <div className={styles.metaInfo}>
-                    <span>{new Date(q.created_at).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
-                  </div>
+                  <time className={styles.metaInfo}>
+                    {new Date(q.created_at).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </time>
                 </div>
 
-                {/* Follow-up context if any */}
                 {q.parent_id && q.parent_question_text && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      fontSize: '0.8rem',
-                      color: 'var(--accent-gold)',
-                      marginBottom: '0.75rem',
-                    }}
-                  >
-                    <GitCommit size={14} />
-                    <span>{t.feed.followUpTo} "{q.parent_question_text}"</span>
+                  <div className={styles.followUpNotice}>
+                    <span>{t.feed.followUpTo} &ldquo;{q.parent_question_text}&rdquo;</span>
                   </div>
                 )}
 
-                {/* Question body */}
                 <div className={styles.questionText}>{q.question_text}</div>
 
-                {/* Answer Composer Area */}
                 <div className={styles.composerSection}>
-                  <label htmlFor={`composer_${q.id}`} className={styles.composerLabel}>
-                    <Send size={14} />
-                    <span>{t.inbox.answerPlaceholder}</span>
-                  </label>
                   <textarea
                     id={`composer_${q.id}`}
                     className="vault-textarea"
@@ -431,14 +350,13 @@ export default function AdminInboxPage() {
                   />
                 </div>
 
-                {/* Actions */}
                 <div className={styles.adminCardActions}>
                   <button
                     onClick={() => handleDelete(q.id)}
                     disabled={isDeletingId === q.id}
                     className={styles.deleteBtn}
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={13} />
                     <span>{isDeletingId === q.id ? t.inbox.deleting : t.inbox.deleteButton}</span>
                   </button>
 
@@ -447,7 +365,7 @@ export default function AdminInboxPage() {
                     disabled={isPublishingId === q.id || !(draftAnswers[q.id] || '').trim()}
                     className="btn-red"
                   >
-                    <Send size={15} />
+                    <Send size={13} />
                     <span>
                       {isPublishingId === q.id
                         ? t.inbox.publishing
@@ -461,40 +379,39 @@ export default function AdminInboxPage() {
         </section>
       )}
 
-      {/* Content for Answered Questions Archive */}
+      {/* Content for Answered Questions */}
       {activeTab === 'answered' && (
         <section>
           {answeredQuestions.length === 0 ? (
             <div className={styles.emptyStateBox}>
-              <Archive size={50} color="var(--text-muted)" />
-              <h3>{locale === 'ar' ? 'لا توجد إجابات منشورة بعد' : 'No Published Dispatches Yet'}</h3>
+              <h3>No answered questions yet</h3>
+              <p>Answer questions from the Pending tab to publish them here.</p>
             </div>
           ) : (
             answeredQuestions.map((q) => (
               <article
                 key={q.id}
-                className={`${styles.adminCard} ${styles.adminCardAnswered}`}
+                className={styles.adminCard}
               >
                 <div className={styles.cardHeader}>
                   <div className={styles.askerTag}>
                     <span>{q.is_anonymous ? t.feed.anonymous : q.asker_name}</span>
-                    <span style={{ color: 'var(--text-muted)' }}>·</span>
-                    <span className="gold-badge" style={{ fontSize: '0.7rem', padding: '0.1rem 0.5rem' }}>
-                      {locale === 'ar' ? `❤️ ${q.likes_count} إعجاب` : `❤️ ${q.likes_count} Likes`}
-                    </span>
+                    <span className={styles.likesNote}>· {q.likes_count} likes</span>
                   </div>
-                  <div className={styles.metaInfo}>
-                    <span>{new Date(q.answered_at || q.created_at).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
-                  </div>
+                  <time className={styles.metaInfo}>
+                    {new Date(q.answered_at || q.created_at).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </time>
                 </div>
 
                 <div className={styles.questionText}>{q.question_text}</div>
 
                 <div className={styles.composerSection}>
-                  <label htmlFor={`edit_${q.id}`} className={styles.composerLabel}>
-                    <Sparkles size={14} />
-                    <span>{t.inbox.editAnswer}</span>
-                  </label>
                   <textarea
                     id={`edit_${q.id}`}
                     className="vault-textarea"
@@ -510,7 +427,7 @@ export default function AdminInboxPage() {
                     disabled={isDeletingId === q.id}
                     className={styles.deleteBtn}
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={13} />
                     <span>{isDeletingId === q.id ? t.inbox.deleting : t.inbox.deleteButton}</span>
                   </button>
 
@@ -519,7 +436,6 @@ export default function AdminInboxPage() {
                     disabled={isPublishingId === q.id}
                     className="btn-red"
                   >
-                    <CheckCircle2 size={15} />
                     <span>{isPublishingId === q.id ? t.inbox.publishing : t.inbox.saveChanges}</span>
                   </button>
                 </div>

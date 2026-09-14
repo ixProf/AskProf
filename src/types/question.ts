@@ -10,6 +10,7 @@ export interface Question {
   likes_count: number;
   parent_id?: string | null;
   parent_question_text?: string | null;
+  display_number?: number | null;
   created_at: string;
   answered_at: string | null;
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from './LanguageContext';
 import { Question } from '@/types/question';
-import { Send, X, ShieldCheck, Lock, CornerDownRight, CheckCircle2 } from 'lucide-react';
+import { MessageSquarePlus, X, CornerDownRight, Check } from 'lucide-react';
 import styles from './AskModal.module.css';
 
 interface AskModalProps {
@@ -28,6 +28,15 @@ export const AskModal: React.FC<AskModalProps> = ({
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const handleClose = React.useCallback(() => {
+    setQuestionText('');
+    setAskerName('');
+    setSubmittedSuccess(false);
+    setErrorMessage(null);
+    if (onClearReplyTo) onClearReplyTo();
+    onClose();
+  }, [onClearReplyTo, onClose]);
+
   // Close on Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -37,16 +46,7 @@ export const AskModal: React.FC<AskModalProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
-
-  const handleClose = () => {
-    setQuestionText('');
-    setAskerName('');
-    setSubmittedSuccess(false);
-    setErrorMessage(null);
-    if (onClearReplyTo) onClearReplyTo();
-    onClose();
-  };
+  }, [isOpen, handleClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +76,7 @@ export const AskModal: React.FC<AskModalProps> = ({
         if (res.status === 429) {
           setErrorMessage(t.askModal.rateLimitError);
         } else {
-          setErrorMessage(data.error || 'Transmission failed.');
+          setErrorMessage(data.error || 'Failed to submit question. Please try again.');
         }
         setIsSubmitting(false);
         return;
@@ -85,7 +85,7 @@ export const AskModal: React.FC<AskModalProps> = ({
       setSubmittedSuccess(true);
     } catch (err) {
       console.error('Submit error:', err);
-      setErrorMessage('Network transmission error. Please retry.');
+      setErrorMessage('Network error. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -93,7 +93,7 @@ export const AskModal: React.FC<AskModalProps> = ({
 
   return (
     <>
-      {/* Persistent Floating Button */}
+      {/* Persistent Floating Action Button */}
       {!isOpen && (
         <div className={styles.floatingCtaContainer}>
           <button
@@ -101,8 +101,7 @@ export const AskModal: React.FC<AskModalProps> = ({
             className={styles.floatingCtaBtn}
             aria-label={t.askModal.triggerButton}
           >
-            <div className={styles.pulsingDot} />
-            <Send size={18} />
+            <MessageSquarePlus size={16} />
             <span>{t.askModal.triggerButton}</span>
           </button>
         </div>
@@ -120,12 +119,8 @@ export const AskModal: React.FC<AskModalProps> = ({
             {/* Header */}
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
-                <div className={styles.vaultBadge}>
-                  <Lock size={13} />
-                  <span>{t.askModal.title}</span>
-                </div>
                 <h3 className={styles.modalTitle}>
-                  {replyToQuestion ? t.feed.followUp : t.askModal.triggerButton}
+                  {replyToQuestion ? t.feed.followUp : t.askModal.title}
                 </h3>
                 <p className={styles.modalDesc}>{t.askModal.desc}</p>
               </div>
@@ -133,23 +128,19 @@ export const AskModal: React.FC<AskModalProps> = ({
               <button
                 onClick={handleClose}
                 className={styles.closeBtn}
-                aria-label="Close"
+                aria-label="Close modal"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
-            {/* If in Success State */}
+            {/* Success State */}
             {submittedSuccess ? (
               <div className={styles.successBox}>
-                <div className={styles.successIconShield}>
-                  <ShieldCheck size={38} />
+                <div className={styles.successIconWrap}>
+                  <Check size={24} />
                 </div>
                 <h4 className={styles.successTitle}>{t.askModal.successTitle}</h4>
-                <div className={styles.vaultSealPill}>
-                  <CheckCircle2 size={14} />
-                  <span>{t.askModal.successBadge}</span>
-                </div>
                 <p className={styles.successDesc}>{t.askModal.successDesc}</p>
                 <button onClick={handleClose} className="btn-red">
                   {t.askModal.closeButton}
@@ -158,13 +149,13 @@ export const AskModal: React.FC<AskModalProps> = ({
             ) : (
               /* Submission Form */
               <form onSubmit={handleSubmit}>
-                {/* Parent Question Reference if follow-up */}
+                {/* Follow-up parent context */}
                 {replyToQuestion && (
                   <div className={styles.parentContextBox}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', overflow: 'hidden' }}>
-                      <CornerDownRight size={14} color="var(--accent-gold)" />
+                    <div className={styles.parentContextContent}>
+                      <CornerDownRight size={13} className={styles.parentContextIcon} />
                       <span className={styles.parentContextText}>
-                        "{replyToQuestion.question_text}"
+                        &ldquo;{replyToQuestion.question_text}&rdquo;
                       </span>
                     </div>
                     {onClearReplyTo && (
@@ -221,9 +212,7 @@ export const AskModal: React.FC<AskModalProps> = ({
                     value={askerName}
                     onChange={(e) => setAskerName(e.target.value)}
                   />
-                  <div className={styles.anonymousHint}>
-                    <span>{t.askModal.anonymousNote}</span>
-                  </div>
+                  <p className={styles.fieldHint}>{t.askModal.anonymousNote}</p>
                 </div>
 
                 {/* Actions */}
@@ -234,18 +223,15 @@ export const AskModal: React.FC<AskModalProps> = ({
                     className="btn-secondary"
                     disabled={isSubmitting}
                   >
-                    {t.askModal.closeButton}
+                    Cancel
                   </button>
                   <button
                     type="submit"
                     className="btn-red"
                     disabled={isSubmitting || questionText.trim().length < 8}
                   >
-                    <Send size={16} />
                     <span>
-                      {isSubmitting
-                        ? t.askModal.submitting
-                        : t.askModal.submitButton}
+                      {isSubmitting ? t.askModal.submitting : t.askModal.submitButton}
                     </span>
                   </button>
                 </div>

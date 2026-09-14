@@ -1,0 +1,361 @@
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4) var(--space-12);
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: var(--space-6) var(--space-4) var(--space-8);
+  }
+}
+
+/* Top Back Navigation */
+.backRow {
+  margin-bottom: var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.backLink:hover {
+  color: var(--accent-red);
+}
+
+.backLinkIcon {
+  transition: transform 0.15s ease-in-out;
+}
+
+.backLink:hover .backLinkIcon {
+  transform: translateX(-3px);
+}
+
+/* Main Detail Card */
+.detailCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  transition: var(--transition-smooth);
+}
+
+@media (max-width: 640px) {
+  .detailCard {
+    padding: var(--space-5) var(--space-4);
+  }
+}
+
+/* Thread Banner for Follow-ups */
+.threadBanner {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: 0.8rem;
+  color: var(--accent-thread);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.threadLabel {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+}
+
+.threadText {
+  color: var(--text-secondary);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80%;
+  transition: var(--transition-smooth);
+}
+
+.threadText:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+/* Header: Submitter alias + full date */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.submitterGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.submitterBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 0.2rem 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+}
+
+.fullDate {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+/* Question Headline */
+.questionHeadline {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.35;
+  margin: 0 0 var(--space-5);
+  word-break: break-word;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .questionHeadline {
+    font-size: 1.35rem;
+  }
+}
+
+/* Visual Divider */
+.visualDivider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-red) 0%,
+    var(--border-subtle) 30%,
+    var(--border-subtle) 100%
+  );
+  margin-bottom: var(--space-6);
+  border: none;
+}
+
+/* Answer Container */
+.answerSection {
+  margin-bottom: var(--space-8);
+}
+
+.answerAuthor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.authorPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent-red);
+}
+
+.answerParagraph {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-4);
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+.answerParagraph:last-child {
+  margin-bottom: 0;
+}
+
+/* Bottom Action Bar */
+.bottomActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.actionsLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.actionsRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Like Button */
+.likeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.likeBtn:hover:not(:disabled) {
+  color: var(--accent-red);
+  background: var(--accent-red-subtle);
+  border-color: var(--border-red);
+}
+
+.likeBtnActive {
+  color: var(--accent-red);
+  background: var(--accent-red-subtle);
+  border-color: var(--border-red);
+}
+
+.heartFilled {
+  fill: var(--accent-red);
+  color: var(--accent-red);
+}
+
+/* Share Button */
+.shareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 0.4rem 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  position: relative;
+}
+
+.shareBtn:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.shareBtnCopied {
+  border-color: #16a34a !important;
+  color: #16a34a !important;
+  background: rgba(22, 163, 74, 0.08) !important;
+}
+
+.copiedIcon {
+  color: #16a34a;
+}
+
+/* Follow-up CTA Button */
+.followUpBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.followUpBtn:hover {
+  border-color: var(--accent-thread);
+  color: var(--accent-thread);
+}
+
+/* Floating Confirmation Toast */
+.toastContainer {
+  position: fixed;
+  bottom: var(--space-8);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-full);
+  padding: 0.55rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-modal);
+  z-index: 1000;
+  animation: toastPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.toastText {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+}
+
+.toastIcon {
+  color: #16a34a;
+}
+
+@keyframes toastPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 15px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}

@@ -1,0 +1,287 @@
+.askSectionCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-6) var(--space-6) var(--space-5);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+  position: relative;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .askSectionCard {
+    padding: var(--space-5) var(--space-4) var(--space-4);
+  }
+}
+
+/* Heading & Subtitle */
+.sectionHeader {
+  margin-bottom: var(--space-4);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: var(--space-2);
+}
+
+.accentDot {
+  color: var(--accent-red);
+}
+
+.sectionSubtitle {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Form Container */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Reply Thread Banner */
+.replyBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+  font-size: 0.76rem;
+}
+
+.replyContent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--accent-thread);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80%;
+}
+
+.replyIcon {
+  flex-shrink: 0;
+}
+
+.cancelReplyBtn {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-decoration: underline;
+}
+
+.cancelReplyBtn:hover {
+  color: var(--text-primary);
+}
+
+/* Error Banner */
+.errorBanner {
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid var(--border-red);
+  color: #ef4444;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-xs);
+  font-size: 0.82rem;
+  margin-bottom: var(--space-3);
+}
+
+/* Large, Prominent Textarea */
+.textareaWrapper {
+  margin-bottom: var(--space-3);
+}
+
+.prominentTextarea {
+  width: 100%;
+  min-height: 140px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  padding: var(--space-4);
+  outline: none;
+  resize: vertical;
+  transition: var(--transition-smooth);
+}
+
+.prominentTextarea:focus {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 0 1px var(--accent-red);
+}
+
+.prominentTextarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Unified Compact Bottom Controls Row */
+.bottomBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.bottomLeftControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 200px;
+}
+
+.compactNameInput {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: var(--space-1) var(--space-3);
+  height: 34px;
+  max-width: 160px;
+  width: 100%;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.compactNameInput:focus {
+  border-color: var(--border-medium);
+}
+
+.compactNameInput::placeholder {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.metaDot {
+  color: var(--accent-red);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.charCounter {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.charCounterWarning {
+  color: #f59e0b;
+}
+
+/* Submit Button - Solid brand red as its default active state */
+.submitBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  height: 38px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: var(--accent-red);
+  color: #ffffff;
+  border: 1px solid var(--accent-red);
+  box-shadow: var(--shadow-subtle);
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--accent-red-hover);
+  border-color: var(--accent-red-hover);
+  transform: translateY(-1px);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Success View */
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-4) var(--space-4);
+}
+
+.successIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-3);
+}
+
+.successTitle {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.successDesc {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 400px;
+  margin-bottom: var(--space-6);
+}
+
+.askAnotherBtn {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-5);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.askAnotherBtn:hover {
+  background: var(--bg-card-hover);
+}

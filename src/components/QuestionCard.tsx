@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Question } from '@/types/question';
-import { useLanguage } from './LanguageContext';
-import { Heart, CornerDownRight, Share2, Check, GitCommit } from 'lucide-react';
+import { Heart, CornerDownRight, Share2, Check } from 'lucide-react';
 import styles from './QuestionCard.module.css';
 
 interface QuestionCardProps {
@@ -14,53 +14,71 @@ interface QuestionCardProps {
   isHighlighted?: boolean;
 }
 
+function formatDisplayDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+function getAnswerPreview(text: string, maxLength = 175): { snippet: string; isTruncated: boolean } {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxLength) {
+    return { snippet: trimmed, isTruncated: false };
+  }
+  const slice = trimmed.slice(0, maxLength);
+  const lastSpace = slice.lastIndexOf(' ');
+  const cleanSlice = lastSpace > 110 ? slice.slice(0, lastSpace) : slice;
+  return {
+    snippet: `${cleanSlice}...`,
+    isTruncated: true,
+  };
+}
+
 export const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   onFollowUp,
   onLikeChanged,
   isHighlighted = false,
 }) => {
-  const { locale, t } = useLanguage();
+  const router = useRouter();
   const [likes, setLikes] = useState(question.likes_count);
-  const [hasLiked, setHasLiked] = useState<boolean>(false);
+  const [hasLiked, setHasLiked] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return Boolean(localStorage.getItem(`prof_liked_${question.id}`));
+    }
+    return false;
+  });
   const [copied, setCopied] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
-  // Check localStorage only after mount (client-side), to avoid SSR/client
-  // hydration mismatches since localStorage doesn't exist on the server.
-  useEffect(() => {
-    if (localStorage.getItem(`prof_liked_${question.id}`)) {
-      setHasLiked(true);
-    }
-  }, [question.id]);
+  const answerUrl = `/answers/${question.display_number ?? question.id}`;
 
-  // Format relative date
-  const formatDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr);
-      const diffMs = Date.now() - date.getTime();
-      const diffMin = Math.floor(diffMs / 60000);
-      const diffHr = Math.floor(diffMin / 60);
-      const diffDay = Math.floor(diffHr / 24);
-
-      if (diffMin < 2) return t.time.justNow;
-      if (diffMin < 60) return t.time.minutesAgo.replace('{n}', diffMin.toString());
-      if (diffHr < 24) return t.time.hoursAgo.replace('{n}', diffHr.toString());
-      return t.time.daysAgo.replace('{n}', diffDay.toString());
-    } catch {
-      return dateStr;
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('a')) {
+      return;
     }
+    router.push(answerUrl);
   };
 
-  const handleLike = async () => {
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (hasLiked || isLiking) return;
     setIsLiking(true);
 
-    // Optimistic update
     const newCount = likes + 1;
     setLikes(newCount);
     setHasLiked(true);
-    localStorage.setItem(`prof_liked_${question.id}`, 'true');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`prof_liked_${question.id}`, 'true');
+    }
     if (onLikeChanged) onLikeChanged(question.id, newCount);
 
     try {
@@ -77,108 +95,104 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     }
   };
 
-  const handleShare = () => {
-    const url = `${window.location.origin}/#q-${question.id}`;
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}${answerUrl}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2200);
+      setTimeout(() => setCopied(false), 2000);
     });
   };
 
-  const askerDisplay = question.is_anonymous
-    ? t.feed.anonymous
-    : question.asker_name || t.feed.anonymous;
+  const answerRaw = question.answer_text || '';
+  const { snippet } = getAnswerPreview(answerRaw);
+
+  const dateValue = question.answered_at || question.created_at;
+  const formattedDate = formatDisplayDate(dateValue);
 
   return (
     <article
       id={`q-${question.id}`}
-      className={`${styles.card} ${isHighlighted ? 'flash-highlight' : ''}`}
+      className={`${styles.card} ${isHighlighted ? styles.cardHighlighted : ''}`}
+      onClick={handleCardClick}
     >
-      {/* Thread Parent Banner if follow-up */}
+      {/* Thread Context Banner if this is a follow-up */}
       {question.parent_id && question.parent_question_text && (
         <div className={styles.threadBanner}>
-          <GitCommit size={14} />
-          <span>{t.feed.followUpTo}</span>
-          <span className={styles.threadText}>"{question.parent_question_text}"</span>
+          <span className={styles.threadLabel}>Follow-up to</span>
+          <Link
+            href={`/answers/${question.parent_id}`}
+            className={styles.threadText}
+            onClick={(e) => e.stopPropagation()}
+            title={question.parent_question_text}
+          >
+            &ldquo;{question.parent_question_text}&rdquo;
+          </Link>
         </div>
       )}
 
-      {/* Asker info header */}
-      <div className={styles.askerMeta}>
-        <div className={styles.askerInfo}>
-          <div className={styles.askerAvatar}>
-            {question.is_anonymous ? '?' : askerDisplay.charAt(0).toUpperCase()}
-          </div>
-          <span className={styles.askerName}>{askerDisplay}</span>
-        </div>
-        <time className={styles.askDate} dateTime={question.created_at} suppressHydrationWarning>
-          {formatDate(question.created_at)}
-        </time>
-      </div>
+      {/* 1. Prominent Bold Question Text at the top linking to detail */}
+      <h3 className={styles.questionTitle}>
+        <Link
+          href={answerUrl}
+          className={styles.titleLink}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {question.question_text}
+        </Link>
+      </h3>
 
-      {/* Question Text */}
-      <p className={styles.questionBody}>{question.question_text}</p>
-
-      {/* Prof Mastermind Answer */}
-      {question.answer_text && (
-        <div className={styles.answerBox}>
-          <div className={styles.answerHeader}>
-            <div className={styles.profMiniMask}>
-              <Image
-                src="/dali-mask.png"
-                alt="Prof Seal"
-                width={24}
-                height={24}
-                className={styles.profMiniImage}
-              />
-            </div>
-            <span className={styles.profTitle}>{t.feed.profSignature}</span>
-            {question.answered_at && (
-              <span className={styles.answerDate} suppressHydrationWarning>
-                {formatDate(question.answered_at)}
-              </span>
-            )}
-          </div>
-          <div className={styles.answerText}>{question.answer_text}</div>
+      {/* 2. Preview/Snippet of the Answer in muted gray text */}
+      {answerRaw && (
+        <div className={styles.answerContainer}>
+          <p className={styles.answerSnippet}>{snippet}</p>
         </div>
       )}
 
-      {/* Footer Actions */}
-      <div className={styles.cardFooter}>
-        <div className={styles.footerLeft}>
+      {/* 3. Bottom Row: "Answered [date]" bottom-left, "Read answer →" bottom-right */}
+      <div className={styles.cardBottomRow}>
+        <div className={styles.bottomLeft}>
+          <span className={styles.answeredLabel}>
+            Answered {formattedDate}
+          </span>
+
           <button
+            type="button"
             onClick={handleLike}
             disabled={hasLiked}
             className={`${styles.likeBtn} ${hasLiked ? styles.likeBtnActive : ''}`}
-            title={hasLiked ? t.feed.liked : t.feed.like}
+            title={hasLiked ? 'Liked' : 'Like question'}
             aria-label={`Like question (${likes})`}
           >
-            <Heart size={15} />
+            <Heart size={12} className={hasLiked ? styles.heartFilled : ''} />
             <span>{likes}</span>
           </button>
 
           <button
-            onClick={() => onFollowUp(question)}
-            className={styles.followUpBtn}
-            title={t.feed.followUp}
-            aria-label="Send a follow up question"
+            type="button"
+            onClick={handleShare}
+            className={styles.toolBtn}
+            title="Copy direct link"
           >
-            <CornerDownRight size={14} />
-            <span>{t.feed.followUp}</span>
+            {copied ? <Check size={12} className={styles.copiedIcon} /> : <Share2 size={12} />}
+            <span className={copied ? styles.copiedText : ''}>
+              {copied ? 'Copied' : 'Share'}
+            </span>
           </button>
         </div>
 
-        <button
-          onClick={handleShare}
-          className={styles.shareBtn}
-          title={t.feed.share}
-          aria-label="Copy link to question"
-        >
-          {copied ? <Check size={14} className={styles.copiedBadge} /> : <Share2 size={14} />}
-          <span className={copied ? styles.copiedBadge : ''}>
-            {copied ? t.feed.copied : t.feed.share}
-          </span>
-        </button>
+        {answerRaw && (
+          <Link
+            href={answerUrl}
+            className={styles.readAnswerLink}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span>Read answer</span>
+            <span className={styles.arrowIcon} aria-hidden="true">
+              →
+            </span>
+          </Link>
+        )}
       </div>
     </article>
   );

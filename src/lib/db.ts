@@ -11,12 +11,12 @@ function getSql() {
 }
 
 const DEFAULT_PROFILE: ProfileBio = {
-  alias_ar: 'بروف',
+  alias_ar: 'Prof',
   alias_en: 'Prof',
-  name_ar: 'محمود سيد محمد',
+  name_ar: 'Mahmoud Sayed Mohamed',
   name_en: 'Mahmoud Sayed Mohamed',
   bio_ar:
-    'مهندس برمجيات على قد حالي، بحاول أعمل حاجات ليها معنى وتفيدني وتفيد غيري. لو عندك سؤال، رأي، نقد، اقتراح، أو حتى حاجة نفسك تقولها ومش عارف تقولها ازاي. ابعتها، هقراها وهسمعك.',
+    "I'm Mahmoud, but most people call me Prof. I'm a software developer who likes building things, trying new ideas, and figuring stuff out along the way. If you have a question, opinion, criticism, advice, or just something you want to say — go ahead. I'm listening.",
   bio_en:
     "I'm Mahmoud, but most people call me Prof. I'm a software developer who likes building things, trying new ideas, and figuring stuff out along the way. If you have a question, opinion, criticism, advice, or just something you want to say — go ahead. I'm listening.",
   linkedin: 'https://www.linkedin.com/in/mahmoud-sayed-mohamed',
@@ -33,6 +33,7 @@ interface QuestionDbRow {
   likes_count: number | string;
   parent_id: string | null;
   parent_question_text?: string | null;
+  display_number?: number | string | null;
   created_at: string | Date;
   answered_at: string | Date | null;
 }
@@ -48,6 +49,7 @@ function formatQuestionRow(row: QuestionDbRow): Question {
     likes_count: Number(row.likes_count) || 0,
     parent_id: row.parent_id || null,
     parent_question_text: row.parent_question_text || null,
+    display_number: row.display_number != null ? Number(row.display_number) : null,
     created_at: row.created_at ? new Date(row.created_at).toISOString() : new Date().toISOString(),
     answered_at: row.answered_at ? new Date(row.answered_at).toISOString() : null,
   };
@@ -141,7 +143,7 @@ export async function getAnsweredQuestions(
       rows = await sql`
         SELECT 
           q.id, q.question_text, q.answer_text, q.status, q.is_anonymous, 
-          q.asker_name, q.likes_count, q.parent_id, q.created_at, q.answered_at,
+          q.asker_name, q.likes_count, q.parent_id, q.display_number, q.created_at, q.answered_at,
           p.question_text AS parent_question_text
         FROM questions q
         LEFT JOIN questions p ON q.parent_id = p.id
@@ -157,7 +159,7 @@ export async function getAnsweredQuestions(
       rows = await sql`
         SELECT 
           q.id, q.question_text, q.answer_text, q.status, q.is_anonymous, 
-          q.asker_name, q.likes_count, q.parent_id, q.created_at, q.answered_at,
+          q.asker_name, q.likes_count, q.parent_id, q.display_number, q.created_at, q.answered_at,
           p.question_text AS parent_question_text
         FROM questions q
         LEFT JOIN questions p ON q.parent_id = p.id
@@ -175,7 +177,7 @@ export async function getAnsweredQuestions(
       rows = await sql`
         SELECT 
           q.id, q.question_text, q.answer_text, q.status, q.is_anonymous, 
-          q.asker_name, q.likes_count, q.parent_id, q.created_at, q.answered_at,
+          q.asker_name, q.likes_count, q.parent_id, q.display_number, q.created_at, q.answered_at,
           p.question_text AS parent_question_text
         FROM questions q
         LEFT JOIN questions p ON q.parent_id = p.id
@@ -186,7 +188,7 @@ export async function getAnsweredQuestions(
       rows = await sql`
         SELECT 
           q.id, q.question_text, q.answer_text, q.status, q.is_anonymous, 
-          q.asker_name, q.likes_count, q.parent_id, q.created_at, q.answered_at,
+          q.asker_name, q.likes_count, q.parent_id, q.display_number, q.created_at, q.answered_at,
           p.question_text AS parent_question_text
         FROM questions q
         LEFT JOIN questions p ON q.parent_id = p.id
@@ -200,20 +202,37 @@ export async function getAnsweredQuestions(
 }
 
 /**
- * Public: Get a single answered question by ID
+ * Public: Get a single answered question by ID (sequential number or opaque ID)
  */
 export async function getAnsweredQuestionById(id: string): Promise<Question | null> {
   const sql = getSql();
-  const rows = await sql`
-    SELECT 
-      q.id, q.question_text, q.answer_text, q.status, q.is_anonymous, 
-      q.asker_name, q.likes_count, q.parent_id, q.created_at, q.answered_at,
-      p.question_text AS parent_question_text
-    FROM questions q
-    LEFT JOIN questions p ON q.parent_id = p.id
-    WHERE q.id = ${id} AND q.status = 'answered'
-    LIMIT 1;
-  `;
+  const isNumeric = /^\d+$/.test(id.trim());
+
+  let rows: unknown[];
+  if (isNumeric) {
+    const num = parseInt(id.trim(), 10);
+    rows = await sql`
+      SELECT 
+        q.id, q.question_text, q.answer_text, q.status, q.is_anonymous, 
+        q.asker_name, q.likes_count, q.parent_id, q.display_number, q.created_at, q.answered_at,
+        p.question_text AS parent_question_text
+      FROM questions q
+      LEFT JOIN questions p ON q.parent_id = p.id
+      WHERE q.display_number = ${num} AND q.status = 'answered'
+      LIMIT 1;
+    `;
+  } else {
+    rows = await sql`
+      SELECT 
+        q.id, q.question_text, q.answer_text, q.status, q.is_anonymous, 
+        q.asker_name, q.likes_count, q.parent_id, q.display_number, q.created_at, q.answered_at,
+        p.question_text AS parent_question_text
+      FROM questions q
+      LEFT JOIN questions p ON q.parent_id = p.id
+      WHERE q.id = ${id} AND q.status = 'answered'
+      LIMIT 1;
+    `;
+  }
 
   if (rows.length === 0) return null;
   return formatQuestionRow(rows[0] as unknown as QuestionDbRow);
@@ -329,7 +348,7 @@ export async function getAllQuestionsAdmin(): Promise<{ pending: Question[]; ans
   const rows = await sql`
     SELECT 
       q.id, q.question_text, q.answer_text, q.status, q.is_anonymous, 
-      q.asker_name, q.likes_count, q.parent_id, q.created_at, q.answered_at,
+      q.asker_name, q.likes_count, q.parent_id, q.display_number, q.created_at, q.answered_at,
       p.question_text AS parent_question_text
     FROM questions q
     LEFT JOIN questions p ON q.parent_id = p.id
@@ -363,7 +382,8 @@ export async function answerAndPublishQuestion(id: string, answerText: string): 
     SET 
       answer_text = ${answerText.trim()},
       status = 'answered',
-      answered_at = COALESCE(answered_at, NOW())
+      answered_at = COALESCE(answered_at, NOW()),
+      display_number = COALESCE(display_number, nextval('questions_display_number_seq'))
     WHERE id = ${id}
     RETURNING *;
   `;
