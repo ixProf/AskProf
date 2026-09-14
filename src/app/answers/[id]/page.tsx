@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getAnsweredQuestionById } from '@/lib/db';
+import { getBaseUrl } from '@/lib/url';
 import { AnswerDetailClient } from './AnswerDetailClient';
 
 interface PageProps {
@@ -20,12 +21,28 @@ function truncateText(text: string, maxLength: number): string {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
+  const baseUrl = getBaseUrl();
   const question = await getAnsweredQuestionById(id);
 
   if (!question || question.status !== 'answered') {
+    const fallbackImage = `${baseUrl}/og-image.png`;
     return {
       title: 'Answer Not Found | Ask Prof',
       description: 'The requested question and answer could not be found.',
+      openGraph: {
+        images: [
+          {
+            url: fallbackImage,
+            width: 1200,
+            height: 630,
+            alt: 'Ask Prof',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        images: [fallbackImage],
+      },
     };
   }
 
@@ -38,7 +55,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // og:description / twitter:description: first ~150-200 characters of the answer text
   const shareDesc = truncateText(rawAnswer, 180);
 
-  const canonicalUrl = `/answers/${question.display_number ?? id}`;
+  const canonicalUrl = `${baseUrl}/answers/${question.display_number ?? id}`;
+  const ogImageUrl = `${baseUrl}/api/og?id=${question.display_number ?? id}`;
 
   return {
     title: `${shareTitle} | Ask Prof`,
@@ -54,10 +72,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'article',
       images: [
         {
-          url: '/icon.png',
-          width: 512,
-          height: 512,
-          alt: 'Ask Prof',
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: shareTitle,
+          type: 'image/png',
         },
       ],
     },
@@ -65,7 +84,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: shareTitle,
       description: shareDesc,
-      images: ['/icon.png'],
+      images: [ogImageUrl],
     },
   };
 }
