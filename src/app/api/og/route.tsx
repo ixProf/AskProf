@@ -15,6 +15,11 @@ function truncate(text: string, maxLen: number): string {
   return `${cleanSlice}...`;
 }
 
+function hasArabic(text?: string | null): boolean {
+  if (!text) return false;
+  return /[\u0600-\u06FF]/.test(text);
+}
+
 // Load Cairo bold font for Arabic + Latin typography
 let fontData: Buffer | null = null;
 try {
@@ -57,8 +62,56 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const isRtlQuestion = hasArabic(questionText);
+  const isRtlAnswer = hasArabic(answerSnippet);
+  const isRtlSubmitter = isSpecificQuestion ? (hasArabic(submitter) || isRtlQuestion) : hasArabic(submitter);
+
+  const submitterText = isSpecificQuestion
+    ? (isRtlSubmitter
+        ? (submitter === 'Anonymous' ? 'السؤال من مجهول' : `السؤال من: ${submitter}`)
+        : `Submitted by ${submitter}`)
+    : 'Mahmoud Sayed Mohamed • Backend Developer';
+
+  // Helper to render text with proper RTL/LTR word flow in Satori
+  const renderBidiText = (
+    text: string,
+    isRtl: boolean,
+    containerStyle: Record<string, any>,
+    gap: string = '10px'
+  ) => {
+    const words = text.split(/\s+/).filter(Boolean);
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: isRtl ? 'row-reverse' : 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          direction: isRtl ? 'rtl' : 'ltr',
+          textAlign: isRtl ? 'right' : 'left',
+          columnGap: gap,
+          rowGap: '6px',
+          ...containerStyle,
+        }}
+      >
+        {words.map((word, idx) => (
+          <span
+            key={idx}
+            style={{
+              direction: isRtl ? 'rtl' : 'ltr',
+              textAlign: isRtl ? 'right' : 'left',
+            }}
+          >
+            {word}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   // Adjust font size based on question length
-  const questionFontSize = questionText.length > 120 ? 34 : questionText.length > 70 ? 40 : 46;
+  const questionFontSize = questionText.length > 120 ? 32 : questionText.length > 70 ? 38 : 44;
 
   return new ImageResponse(
     (
@@ -102,17 +155,18 @@ export async function GET(request: NextRequest) {
             }}
           />
 
-          {/* Top Bar: Wordmark on Left, Badge on Right */}
+          {/* Top Bar: Wordmark on Left, Badge on Right (always LTR) */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               width: '100%',
+              direction: 'ltr',
             }}
           >
-            {/* Wordmark + Smiley */}
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            {/* Wordmark + Smiley (always LTR) */}
+            <div style={{ display: 'flex', alignItems: 'center', direction: 'ltr' }}>
               {/* Hand-drawn red marker smiley SVG */}
               <svg
                 width="36"
@@ -151,7 +205,7 @@ export async function GET(request: NextRequest) {
               <span style={{ color: '#dc2626', fontSize: '28px', fontWeight: 700 }}>.</span>
             </div>
 
-            {/* Pill Badge */}
+            {/* Pill Badge (always LTR) */}
             <div
               style={{
                 display: 'flex',
@@ -164,6 +218,7 @@ export async function GET(request: NextRequest) {
                 fontSize: '17px',
                 fontWeight: 700,
                 letterSpacing: '0.04em',
+                direction: 'ltr',
               }}
             >
               {badgeLabel}
@@ -175,8 +230,10 @@ export async function GET(request: NextRequest) {
             style={{
               display: 'flex',
               flexDirection: 'column',
+              alignItems: isRtlQuestion ? 'flex-end' : 'flex-start',
               margin: 'auto 0',
-              padding: '16px 0',
+              padding: '12px 0',
+              width: '100%',
             }}
           >
             {/* Small red accent tick */}
@@ -186,40 +243,43 @@ export async function GET(request: NextRequest) {
                 height: '4px',
                 backgroundColor: '#dc2626',
                 borderRadius: '2px',
-                marginBottom: '18px',
+                marginBottom: '16px',
+                alignSelf: isRtlQuestion ? 'flex-end' : 'flex-start',
               }}
             />
 
             {/* Question Text */}
-            <div
-              style={{
+            {renderBidiText(
+              questionText,
+              isRtlQuestion,
+              {
                 color: '#f4f4f6',
                 fontSize: `${questionFontSize}px`,
                 fontWeight: 700,
-                lineHeight: 1.32,
-                display: 'flex',
-                flexWrap: 'wrap',
+                lineHeight: 1.35,
+                width: '100%',
                 maxHeight: '220px',
                 overflow: 'hidden',
-              }}
-            >
-              {questionText}
-            </div>
+              },
+              '10px'
+            )}
 
             {/* Answer Snippet (if available) */}
-            {answerSnippet && (
-              <div
-                style={{
+            {answerSnippet ? (
+              renderBidiText(
+                answerSnippet,
+                isRtlAnswer,
+                {
                   color: '#a1a1aa',
-                  fontSize: '21px',
-                  lineHeight: 1.5,
+                  fontSize: '20px',
+                  fontWeight: 700,
+                  lineHeight: 1.45,
                   marginTop: '16px',
-                  display: 'flex',
-                }}
-              >
-                {answerSnippet}
-              </div>
-            )}
+                  width: '100%',
+                },
+                '8px'
+              )
+            ) : null}
           </div>
 
           {/* Bottom Bar: Submitter & Domain info */}
@@ -231,18 +291,19 @@ export async function GET(request: NextRequest) {
               paddingTop: '20px',
               borderTop: '1px solid rgba(255, 255, 255, 0.08)',
               width: '100%',
+              flexDirection: isRtlSubmitter ? 'row-reverse' : 'row',
             }}
           >
-            <div
-              style={{
+            {renderBidiText(
+              submitterText,
+              isRtlSubmitter,
+              {
                 color: '#71717a',
                 fontSize: '17px',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              {isSpecificQuestion ? `Submitted by ${submitter}` : 'Mahmoud Sayed Mohamed • Backend Developer'}
-            </div>
+                fontWeight: 700,
+              },
+              '6px'
+            )}
 
             <div
               style={{
@@ -251,6 +312,7 @@ export async function GET(request: NextRequest) {
                 fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
+                direction: 'ltr',
               }}
             >
               askyabasha.vercel.app
